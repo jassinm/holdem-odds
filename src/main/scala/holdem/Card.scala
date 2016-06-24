@@ -17,8 +17,8 @@ abstract sealed class Rank extends Ordered[Rank]{
   def compare(that: Rank) = value compare that.value
 }
 
-case class Two() extends Rank {val value=0; val prime=2}
-case class Three() extends Rank{val value=1; val prime=3}
+case class Deuce() extends Rank {val value=0; val prime=2}
+case class Trey() extends Rank{val value=1; val prime=3}
 case class Four() extends Rank{val value=2; val prime=5}
 case class Five() extends Rank{val value=3; val prime=7}
 case class Six() extends Rank{val value=4; val prime=11}
@@ -34,8 +34,8 @@ case class Ace() extends Rank{val value=12; val prime=41}
 object Rank {
 
   def from_char(c: Char): Rank = c match {
-    case '2' => new Two()
-    case '3' => new Three()
+    case '2' => new Deuce()
+    case '3' => new Trey()
     case '4' => new Four()
     case '5' => new Five()
     case '6' => new Six()
@@ -61,24 +61,31 @@ object Rank {
 
 
 
-sealed trait Suit
-
-case class Hearts() extends Suit {
-  override def toString = {
-       "♡"
-    }
-  }
-case class Diamonds() extends Suit{
-  override def toString = {
-    "♢"
-  }
+sealed trait Suit {
+ val value: Int
 }
 case class Clubs() extends Suit {
+  val value = 0
   override def toString = {
     "♧"
   }
 }
+case class Diamonds() extends Suit{
+  val value = 1
+  override def toString = {
+    "♢"
+  }
+}
+
+case class Hearts() extends Suit {
+  val value = 2
+  override def toString = {
+    "♡"
+  }
+}
+
 case class Spades() extends Suit{
+  val value = 3
   override def toString = {
     "♤"
   }
@@ -100,7 +107,7 @@ object Suit{
     case '♠' => Spades()
     case '♤' => Spades()
   }
-  val suits: Array[Suit] = Array(Hearts(), Diamonds(), Clubs(), Spades())
+  val suits: Array[Suit] = Array(Spades(), Hearts(), Diamonds(), Clubs())
 
 
 }
@@ -115,7 +122,25 @@ class Card(r:Rank, s:Suit) {
   }
 
   override def toString = {
-    "Card( %s%s )".format(r, s)
+    "%s%s".format(r, s)
+  }
+
+  /**
+    * http://suffe.cool/poker/evaluator.html 
+    * bitrank     suit rank   prime
+    * +--------+--------+--------+--------+
+    * |xxxbbbbb|bbbbbbbb|cdhsrrrr|xxpppppp|
+    * +--------+--------+--------+--------+
+    * 1) p = prime number of rank (deuce=2,trey=3,four=5,...,ace=41)
+    * 2) r = rank of card (deuce=0,trey=1,four=2,five=3,...,ace=12)
+    * 3) cdhs = suit of card (bit turned on based on suit of card)
+    * 4) b = bit turned on depending on rank of card
+    * 5) x = unused
+    */
+  def bit_value(): Int = {
+    val rank = (1 << (this.rank.value + 16)) | (this.rank.value << 8)
+    val suit = (1 << (this.suit.value + 12))
+    rank | suit | this.rank.prime
   }
 }
 

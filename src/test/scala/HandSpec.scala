@@ -5,29 +5,29 @@ import holdem._
 
 class HandSpec extends FunSpec with Matchers {
 
-  it("should understand straight flush") {
 
-    val hand = Hand.from_string("2d3d4d5d6dQsJc")
-    Hand.is_flush(hand) shouldEqual true
-    val hand1 = Hand.from_string("Jc2d3d4d5d6dQs")
-    Hand.is_flush(hand1) shouldEqual true
-    val hand2 = Hand.from_string("Jc2d3d4d5dQs")
-    Hand.is_flush(hand2) shouldEqual false
+  it("should be able to rank hands"){
+    /*
+     Hand strength is valued on a scale of 1 to 7462,
+     where 1 is a Royal Flush and 7462 is unsuited 7-5-4-3-2
+     */
+    val royal_flush = CardsParser.parse("TsJsQsKsAs")
+    Hand.evaluate(royal_flush) shouldEqual 1
 
-    Hand.handtype(hand) shouldEqual StraightFlush
+    val straight_flush = CardsParser.parse("9sTsJsQsKs")
+    Hand.evaluate(straight_flush) shouldEqual 2
 
-  }
+    val straight_flush_queen_high = CardsParser.parse("8s9sTsJsQs")
+    Hand.evaluate(straight_flush_queen_high) shouldEqual 3
 
-  it("should know how to compare same hand types"){
 
-    val hand1 = Hand.from_string("AdAcAsAh5c")
-    val hand2 = Hand.from_string("KdKcKsKh5c")
-    Hand.is_four_of_kind(hand1) shouldEqual true
-    Hand.is_four_of_kind(hand2) shouldEqual true
-
-    //(hand1 > hand2) shouldEqual  true
-
+    val seven_high= CardsParser.parse("7s6h4c3h2s")
+    Hand.evaluate(seven_high) shouldEqual 7461
+    val seven_high1 = CardsParser.parse("7s5h4c3h2s")
+    Hand.evaluate(seven_high1) shouldEqual 7462
 
   }
+
+
 
 }

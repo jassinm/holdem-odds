@@ -95,15 +95,19 @@ case class Spades() extends Suit{
 object Suit{
   def from_char(c: Char): Suit = c match{
     case 'h' => Hearts()
+    case 'H' => Hearts()
     case '♥' => Hearts()
     case '♡' => Hearts()
     case 'd' => Diamonds()
+    case 'D' => Diamonds()
     case '♦' => Diamonds()
     case '♢' => Diamonds()
     case 'c' => Clubs()
+    case 'C' => Clubs()
     case '♣' => Clubs()
     case '♧' => Clubs()
     case 's' => Spades()
+    case 'S' => Spades()
     case '♠' => Spades()
     case '♤' => Spades()
   }

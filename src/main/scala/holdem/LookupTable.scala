@@ -4,9 +4,9 @@ import scala.io.Source
 
 object LookupTable {
 
-  val flushes = Source.fromFile("flushes.txt").getLines.toArray.map(x=> x.toInt)
-  val unique5 = Source.fromFile("unique5.txt").getLines.toArray.map(x=> x.toInt)
-  val hash_values = Source.fromFile("hashvalues.txt").getLines.toArray.map(x=> x.toInt)
+  val flushes = Source.fromFile("./conf/data/flushes.txt").getLines.toArray.map(x=> x.toInt)
+  val unique5 = Source.fromFile("./conf/data/unique5.txt").getLines.toArray.map(x=> x.toInt)
+  val hash_values = Source.fromFile("./conf/data/hashvalues.txt").getLines.toArray.map(x=> x.toInt)
 
 
   val hash_adjust = Array(0, 5628, 7017, 1298, 2918, 2442, 8070, 6383, 6383, 7425, 2442, 5628, 8044, 7425, 3155, 6383,

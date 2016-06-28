@@ -13,8 +13,32 @@ object Dealer {
     val other_hands = other_players_hands.map(c=> Hand(board ++ c))
     val best_other_hand = other_hands.min
 
-    player_hand compare best_other_hand
+    //player hand wins if it is smaller then the best_other_hand
+    //player hand ties if it is equal to the best_other_hand
+    best_other_hand compare player_hand
 
+
+  }
+
+  def deal_hands(number_of_players: Int, deck: List[Card]): List[List[Card]] = {
+    def gen_other_players_hands(cnt: Int, cards: List[Card],
+                                hands: List[List[Card]]): List[List[Card]] = cnt match{
+      case 0 => hands
+      case _ => gen_other_players_hands(cnt-1, cards.drop(2), hands ++ List(cards.take(2)))
+    }
+    gen_other_players_hands(number_of_players, deck, List())
+  }
+
+  def deal_flop(deck: List[Card]): List[Card] = {
+    deck.take(3)
+  }
+
+  def deal_turn(deck: List[Card]): List[Card] = {
+    deck.take(1)
+  }
+
+  def deal_river(deck: List[Card]): List[Card] = {
+    deck.take(1)
   }
 
 }
@@ -26,47 +50,34 @@ case class Config(player_hand_str: String="",
 object Holdem {
 
 
-  def play_single_game(hand: List[Card],
+  def play_single_game(dealer_cards: Set[Card],
+                       hand: List[Card],
                        community_cards: List[Card],
                        number_of_players: Int) = {
 
-    val deck = Deck.generate
 
-    val dealer_cards = (deck -- community_cards.toSet -- hand.toSet)
+    val cards = Deck.shuffle(dealer_cards)
 
-    def play_game(cards: Set[Card]) = {
+    val other_players = 1 to (number_of_players - 1)
 
-      val other_players = 1 to (number_of_players - 1)
+    val other_players_hands = Dealer.deal_hands(number_of_players -1, cards.toList)
+    val other_players_cards = other_players_hands.flatten.toSet
+    val deck_cards = (cards -- other_players_cards).toList
 
-      def gen_other_players_hands(cnt: Int, cards: List[Card],
-                                  hands: List[List[Card]]): List[List[Card]] = cnt match{
-        case 0 => hands
-        case _ => gen_other_players_hands(cnt-1, cards.drop(2), hands ++ List(cards.take(2)))
-      }
+    //make sure all five cards are dealt from the deck
 
-      val other_players_hands = gen_other_players_hands(number_of_players - 1,
-                                                        dealer_cards.toList,
-                                                        List())
-      val other_players_cards = other_players_hands.flatten.toSet
-      val deck_cards = (dealer_cards -- other_players_cards).toList
-
-      //make sure all five cards are dealt
-
-      val (table_cards, _) = community_cards.size match {
-        case 0 => //deal flop //turn and river
-          (deck_cards.slice(0, 5), deck_cards.slice(6, deck_cards.size-1))
-        case 3 => //deal turn and river
-          (community_cards ++ deck_cards.slice(0, 2), deck_cards.slice(6, deck_cards.size-1))
-        case 4 => // deal river
-          (community_cards ++ List(deck_cards.head), deck_cards.tail)
-        case 5 =>
-          (community_cards, deck_cards)
-      }
-      Dealer.evaluate(hand, table_cards, other_players_hands)
+    val table_cards= community_cards.size match {
+      case 0 => //deal flop //turn and river
+        deck_cards.take(5)
+      case 3 => //deal turn and river
+        community_cards ++ deck_cards.take(2)
+      case 4 => // deal river
+        community_cards ++ List(deck_cards.head)
+      case 5 =>
+        community_cards
     }
 
-    play_game(Deck.shuffle(dealer_cards))
-
+    Dealer.evaluate(hand, table_cards, other_players_hands)
 
    }
 
@@ -77,7 +88,10 @@ object Holdem {
 
     def run_montecarlo_trials(trials: Int, wins: Int, ties: Int, losses: Int): (Int, Int, Int) = {
 
-      val game_result = play_single_game(hand, community_cards, number_of_players)
+      val deck = Deck.generate
+      val dealer_cards = (deck -- community_cards.toSet -- hand.toSet)
+
+      val game_result = play_single_game(dealer_cards, hand, community_cards, number_of_players)
       (trials, game_result) match {
         case (0, _) => (wins, ties, losses)
         case (_, 1)=> run_montecarlo_trials(trials - 1, wins + 1, ties, losses)

@@ -35,16 +35,16 @@ object Hand{
    }
 
   private def find_fast(x: Int): Int ={
-    var y = x
-    y += 0xe91aaa35
+    var y: Long = x
+    y += 0XE91AAA35L
     y ^= y >> 16
     y += y << 8
-    y &= 0xffffffff
+    y &= 0xffffffffL
     y ^= y >> 4
     val b = (y >> 8) & 0x1ff
     val a = (y + (y << 2)) >> 19
-    val r = (a ^ LookupTable.hash_adjust(b)) & 0x1fff
-    r
+    val r = (a ^ LookupTable.hash_adjust(b.toInt)) & 0x1fff
+    r.toInt
   }
 
 

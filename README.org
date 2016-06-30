@@ -1,0 +1,30 @@
+#+TITLE: Holdem-Odds
+
+
+* Introduction
+
+This repository contains source code for the Holdem-Odds app
+that helps in calculating the odds of winning in Texas Holdem
+
+
+* Usage
+
+#+BEGIN_SRC
+> run --help
+[info] Running holdem.Holdem --help
+Usage: holdem [options]
+
+  -n, --number_of_players <value>
+                           number of players
+  -c, --community_cards <value>
+                           community cards: 3,4 or 5 cards
+  -p, --player_hand <value>
+                           player cards: 2 cards
+  --help                   prints this usage text
+
+#+END_SRC
+
+
+#+BEGIN_SRC
+run -p "AsAh" -n 3
+#+END_SRC
